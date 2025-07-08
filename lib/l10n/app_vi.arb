@@ -1,0 +1,19 @@
+{
+  "@@locale": "vi",
+  "welcomeBack": "Chào mừng trở lại",
+  "loginToContinue": "Đăng nhập để tiếp tục",
+  "email": "Email",
+  "password": "Mật khẩu",
+  "loginButton": "Đăng Nhập",
+  "loginWithGoogle": "Đăng nhập với Google",
+  "entry": "Vào lệnh",
+  "stopLoss": "Dừng lỗ",
+  "takeProfit1": "TP1",
+  "takeProfit2": "TP2",
+  "takeProfit3": "TP3",
+  "signalTypeBuy": "MUA",
+  "signalTypeSell": "BÁN",
+  "tabRunning": "Đang chạy",
+  "tabHistory": "Lịch sử",
+  "viewDetails": "Xem Chi Tiết"
+}
