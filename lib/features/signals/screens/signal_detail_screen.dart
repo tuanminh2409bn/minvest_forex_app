@@ -1,6 +1,8 @@
 // lib/features/signals/screens/signal_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:minvest_forex_app/features/signals/models/signal_model.dart';
+import 'package:minvest_forex_app/core/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignalDetailScreen extends StatelessWidget {
   final Signal signal;
@@ -8,10 +10,9 @@ class SignalDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${signal.type.toUpperCase()} ${signal.symbol}'),
-      ),
+      appBar: AppBar( /* ... */ ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -21,12 +22,18 @@ class SignalDetailScreen extends StatelessWidget {
           _buildDetailRow('Take Profit 1', signal.takeProfits.isNotEmpty ? signal.takeProfits[0].toString() : '—'),
           _buildDetailRow('Take Profit 2', signal.takeProfits.length > 1 ? signal.takeProfits[1].toString() : '—'),
           _buildDetailRow('Take Profit 3', signal.takeProfits.length > 2 ? signal.takeProfits[2].toString() : '—'),
-          if (signal.status == 'closed') ...[
+          if (userProvider.userTier == 'elite' && signal.reason != null && signal.reason!.isNotEmpty) ...[
             const Divider(height: 32),
-            _buildDetailRow('Result', signal.result ?? 'N/A', color: Colors.blue.shade300),
-            _buildDetailRow('PIPs', signal.pips?.toString() ?? 'N/A', color: (signal.pips ?? 0) >= 0 ? Colors.green : Colors.red),
-          ],
-          // TODO: Thêm phần "Lý do vào lệnh" cho tài khoản Ultimate
+            Text(
+              'Analysis & Reason',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber.shade300),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              signal.reason!,
+              style: TextStyle(fontSize: 16, height: 1.5, color: Colors.grey.shade300),
+            ),
+          ]
         ],
       ),
     );

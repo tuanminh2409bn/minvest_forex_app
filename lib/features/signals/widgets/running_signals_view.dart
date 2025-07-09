@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:minvest_forex_app/features/signals/models/signal_model.dart';
 import 'package:minvest_forex_app/features/signals/services/signal_service.dart';
 import 'package:minvest_forex_app/features/signals/widgets/signal_card.dart';
+import 'package:minvest_forex_app/core/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class RunningSignalsView extends StatelessWidget {
   const RunningSignalsView({super.key});
@@ -11,8 +13,9 @@ class RunningSignalsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SignalService signalService = SignalService();
+    final userProvider = Provider.of<UserProvider>(context);
     return StreamBuilder<QuerySnapshot>(
-      stream: signalService.getRunningSignals(),
+      stream: signalService.getRunningSignals(userTier: userProvider.userTier),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

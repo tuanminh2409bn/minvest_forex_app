@@ -9,8 +9,10 @@ class Signal {
   final double stopLoss;
   final List<dynamic> takeProfits;
   final Timestamp createdAt;
+  // --- THÊM CÁC TRƯỜNG MỚI ---
   final String? result;
   final num? pips;
+  final String? reason; // Thêm trường `reason` ở đây
 
   Signal({
     required this.id,
@@ -23,9 +25,9 @@ class Signal {
     required this.createdAt,
     this.result,
     this.pips,
+    this.reason, // Thêm vào constructor
   });
 
-  // Factory constructor để tạo Signal từ một DocumentSnapshot của Firestore
   factory Signal.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Signal(
@@ -39,6 +41,7 @@ class Signal {
       createdAt: data['createdAt'] ?? Timestamp.now(),
       result: data['result'],
       pips: data['pips'],
+      reason: data['reason'], // Lấy dữ liệu `reason` từ Firestore
     );
   }
 }
