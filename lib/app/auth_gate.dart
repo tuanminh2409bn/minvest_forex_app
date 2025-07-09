@@ -19,24 +19,24 @@ class AuthGate extends StatelessWidget {
         }
 
         if (authSnapshot.hasData) {
-          // Người dùng đã đăng nhập, bây giờ kiểm tra quyền trong Firestore
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance.collection('users').doc(authSnapshot.data!.uid).snapshots(),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-              // Nếu document user chưa tồn tại hoặc không có quyền
-              if (!userSnapshot.hasData || !userSnapshot.data!.exists || userSnapshot.data!.get('subscriptionTier') == null) {
-                return const VerificationScreen(); // Chuyển đến màn hình xác thực
+              if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                final data = userSnapshot.data!.data() as Map<String, dynamic>?;
+                if (data != null && data.containsKey('subscriptionTier')) {
+                  return const SignalDashboardScreen();
+                }
               }
-              // Nếu đã có quyền, vào màn hình chính
-              return const SignalDashboardScreen();
+              return const VerificationScreen();
+
             },
           );
         }
 
-        // Nếu người dùng chưa đăng nhập
         return const LoginScreen();
       },
     );

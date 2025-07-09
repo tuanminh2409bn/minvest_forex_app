@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:minvest_forex_app/features/auth/services/auth_service.dart'; // Thêm import
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -39,15 +40,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
     });
 
     try {
-      // Tạo một tham chiếu đến vị trí lưu ảnh trên Firebase Storage
       final ref = _storage.ref().child('verification_images/${_currentUser!.uid}.jpg');
-
-      // Tải file lên
       await ref.putFile(_imageFile!);
 
       setState(() {
-        _statusMessage = 'Tải lên thành công! Vui lòng chờ quản trị viên xét duyệt trong vài giờ.';
-        _imageFile = null; // Xóa ảnh đã chọn sau khi tải lên
+        _statusMessage = 'Tải lên thành công! Vui lòng chờ...';
+        _imageFile = null;
       });
 
     } catch (e) {
@@ -68,6 +66,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
       appBar: AppBar(
         title: const Text('Xác Thực Tài Khoản'),
         automaticallyImplyLeading: false, // Ẩn nút back
+        // =========== THÊM MỚI Ở ĐÂY ===========
+        actions: [
+          IconButton(
+            onPressed: () => AuthService().signOut(),
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+          ),
+        ],
+        // ======================================
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:minvest_forex_app/l10n/app_localizations.dart';
 import 'package:minvest_forex_app/features/auth/screens/profile_screen.dart';
 
-// Chuyển đổi thành StatefulWidget để quản lý trạng thái của tab đang được chọn.
 class SignalDashboardScreen extends StatefulWidget {
   const SignalDashboardScreen({super.key});
 
@@ -45,15 +44,13 @@ class _SignalDashboardScreenState extends State<SignalDashboardScreen> {
     final List<String> _appBarTitles = [
       l10n.tabRunning,
       l10n.tabHistory,
-      'Profile' // Sẽ dịch sau nếu cần
+      l10n.profile
     ];
 
     return Scaffold(
       appBar: AppBar(
-        // Thay đổi tiêu đề dựa trên tab đang được chọn
         title: Text(_appBarTitles[_selectedIndex]),
         actions: [
-          // Nút chọn ngôn ngữ
           PopupMenuButton<Locale>(
             onSelected: (Locale locale) {
               languageProvider.setLocale(locale);
@@ -82,7 +79,6 @@ class _SignalDashboardScreenState extends State<SignalDashboardScreen> {
       ),
       // Hiển thị widget tương ứng với tab được chọn
       body: _pages.elementAt(_selectedIndex),
-      // Thanh điều hướng ở dưới cùng
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -98,7 +94,7 @@ class _SignalDashboardScreenState extends State<SignalDashboardScreen> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.person_outline),
             activeIcon: const Icon(Icons.person),
-            label: 'Profile', // Sẽ dịch sau nếu cần
+            label: l10n.profile, // Dùng l10n
           ),
         ],
         currentIndex: _selectedIndex,

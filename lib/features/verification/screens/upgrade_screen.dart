@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:minvest_forex_app/l10n/app_localizations.dart';
 
 class UpgradeScreen extends StatefulWidget {
   const UpgradeScreen({super.key});
@@ -14,63 +15,109 @@ class UpgradeScreen extends StatefulWidget {
 class _UpgradeScreenState extends State<UpgradeScreen> {
   File? _imageFile;
   bool _isLoading = false;
-  String _statusMessage = 'Tải lên ảnh chụp tài khoản Exness với số dư mới.';
+  String _statusMessageKey = 'uploadPrompt';
 
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
+  // Hàm để hiển thị thông báo SnackBar
+  void _showFeedbackSnackbar(String message, {bool isError = false}) {
+    if (!mounted) return; // Kiểm tra widget còn tồn tại trên cây widget không
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      ),
+    );
+  }
+
+  // Hàm để chọn ảnh từ thư viện
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
-        _statusMessage = 'Đã chọn ảnh. Nhấn "Gửi đi" để xác thực.';
+        _statusMessageKey = 'statusImageSelected';
       });
     }
   }
 
+  // Hàm để tải ảnh lên Firebase Storage
   Future<void> _uploadImage() async {
     if (_imageFile == null || _currentUser == null) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isLoading = true;
-      _statusMessage = 'Đang tải ảnh lên, vui lòng chờ...';
+      _statusMessageKey = 'statusUploading';
     });
 
     try {
       final ref = _storage.ref().child('verification_images/${_currentUser!.uid}.jpg');
       await ref.putFile(_imageFile!);
 
+      if (!mounted) return;
       setState(() {
-        _statusMessage = 'Tải lên thành công! Vui lòng chờ quản trị viên xét duyệt trong vài giờ.';
+        _statusMessageKey = 'statusUploadSuccess';
         _imageFile = null;
       });
+      _showFeedbackSnackbar(l10n.statusUploadSuccess);
 
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _statusMessage = 'Tải lên thất bại. Vui lòng thử lại.';
+        _statusMessageKey = 'statusUploadFailed';
       });
+      _showFeedbackSnackbar(l10n.statusUploadFailed, isError: true);
       print('Lỗi tải ảnh: $e');
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
     }
   }
 
+  // Hàm để lấy chuỗi đã dịch từ key
+  String _getTranslatedStatus(BuildContext context, String key) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'uploadPrompt':
+        return l10n.uploadPrompt;
+      case 'statusImageSelected':
+        return l10n.statusImageSelected;
+      case 'statusUploading':
+        return l10n.statusUploading;
+      case 'statusUploadSuccess':
+        return l10n.statusUploadSuccess;
+      case 'statusUploadFailed':
+        return l10n.statusUploadFailed;
+      default:
+        return l10n.uploadPrompt;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Upgrade Account Tier')),
+      appBar: AppBar(title: Text(l10n.upgradeScreenTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Compare Tiers',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              l10n.compareTiers,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -83,20 +130,17 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
                 3: FlexColumnWidth(1.2),
               },
               children: [
-                _buildTableHeader(['Feature', 'Demo', 'VIP', 'Elite']),
-                _buildTableRow(['Balance', '< 200', '>= 200', '>= 500']),
-                _buildTableRow(['Signal Time', '8h-17h', '8h-17h', 'Fulltime']),
-                _buildTableRow(['Signal Qty', '7-8', 'Full', 'Full']),
-                // =========== SỬA LỖI Ở ĐÂY ===========
-                // Thay thế ký tự đặc biệt bằng chuỗi 'YES'/'NO'
-                _buildTableRow(['Analysis', 'NO', 'NO', 'YES']),
-                _buildTableRow(['Mobile & Web App', 'NO', 'YES', 'YES']),
-                // ======================================
+                _buildTableHeader([l10n.feature, l10n.tierDemo, l10n.tierVIP, l10n.tierElite]),
+                _buildTableRow([l10n.balance, '< \$200', '>= \$200', '>= \$500']),
+                _buildTableRow([l10n.signalTime, '8h-17h', '8h-17h', 'Fulltime']),
+                _buildTableRow([l10n.signalQty, '7-8', 'Full', 'Full']),
+                _buildTableRow([l10n.analysis, 'NO', 'NO', 'YES']),
+                _buildTableRow([l10n.mobileWebApp, 'NO', 'YES', 'YES']),
               ],
             ),
             const SizedBox(height: 40),
             Text(
-              _statusMessage,
+              _getTranslatedStatus(context, _statusMessageKey),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 15, color: Colors.grey.shade300),
             ),
@@ -111,7 +155,7 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
             OutlinedButton.icon(
               onPressed: _isLoading ? null : _pickImage,
               icon: const Icon(Icons.photo_library_outlined),
-              label: const Text('Select New Screenshot'),
+              label: Text(l10n.buttonSelectScreenshot),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -125,7 +169,7 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
               ),
               child: _isLoading
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white))
-                  : const Text('Submit for Review', style: TextStyle(fontSize: 16)),
+                  : Text(l10n.buttonSubmitReview, style: const TextStyle(fontSize: 16)),
             ),
           ],
         ),
@@ -141,8 +185,6 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
     )).toList(),
   );
 
-  // =========== SỬA LỖI Ở ĐÂY ===========
-  // Cập nhật logic để kiểm tra chuỗi 'YES'/'NO'
   TableRow _buildTableRow(List<String> cells) => TableRow(
     children: cells.map((cell) {
       Widget child;
@@ -156,5 +198,4 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
       return Padding(padding: const EdgeInsets.all(12.0), child: child);
     }).toList(),
   );
-// ======================================
 }

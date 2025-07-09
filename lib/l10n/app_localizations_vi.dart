@@ -55,4 +55,69 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get viewDetails => 'Xem Chi Tiết';
+
+  @override
+  String get profile => 'Hồ sơ';
+
+  @override
+  String get upgradeAccount => 'Nâng cấp Tài khoản';
+
+  @override
+  String get upgradeAccountSubtitle =>
+      'Gửi ảnh chụp màn hình mới để nâng cấp hạng.';
+
+  @override
+  String get upgradeScreenTitle => 'Nâng Cấp Hạng Tài Khoản';
+
+  @override
+  String get compareTiers => 'So Sánh Các Hạng';
+
+  @override
+  String get feature => 'Tính Năng';
+
+  @override
+  String get tierDemo => 'Demo';
+
+  @override
+  String get tierVIP => 'VIP';
+
+  @override
+  String get tierElite => 'Elite';
+
+  @override
+  String get balance => 'Số Dư';
+
+  @override
+  String get signalTime => 'Thời Gian Tín Hiệu';
+
+  @override
+  String get signalQty => 'Số Lượng Tín Hiệu';
+
+  @override
+  String get analysis => 'Phân Tích';
+
+  @override
+  String get mobileWebApp => 'App Di Động & Web';
+
+  @override
+  String get uploadPrompt => 'Tải lên ảnh chụp tài khoản Exness với số dư mới.';
+
+  @override
+  String get statusImageSelected => 'Đã chọn ảnh. Nhấn \'Gửi đi\' để xác thực.';
+
+  @override
+  String get statusUploading => 'Đang tải ảnh lên, vui lòng chờ...';
+
+  @override
+  String get statusUploadSuccess =>
+      'Tải lên thành công! Vui lòng chờ quản trị viên xét duyệt trong vài giờ.';
+
+  @override
+  String get statusUploadFailed => 'Tải lên thất bại. Vui lòng thử lại.';
+
+  @override
+  String get buttonSelectScreenshot => 'Chọn Ảnh Chụp Mới';
+
+  @override
+  String get buttonSubmitReview => 'Gửi Đi Để Xét Duyệt';
 }

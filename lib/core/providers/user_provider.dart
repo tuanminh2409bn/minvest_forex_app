@@ -21,7 +21,7 @@ class UserProvider with ChangeNotifier {
           if (snapshot.exists && snapshot.data()!.containsKey('subscriptionTier')) {
             _userTier = snapshot.data()!['subscriptionTier'];
           } else {
-            _userTier = null; // hoặc 'demo'
+            _userTier = null;
           }
           notifyListeners();
         });

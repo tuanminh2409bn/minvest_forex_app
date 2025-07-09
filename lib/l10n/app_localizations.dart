@@ -193,6 +193,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View Details'**
   String get viewDetails;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @upgradeAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Account'**
+  String get upgradeAccount;
+
+  /// No description provided for @upgradeAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit a new screenshot to upgrade your tier.'**
+  String get upgradeAccountSubtitle;
+
+  /// No description provided for @upgradeScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Account Tier'**
+  String get upgradeScreenTitle;
+
+  /// No description provided for @compareTiers.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Tiers'**
+  String get compareTiers;
+
+  /// No description provided for @feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature'**
+  String get feature;
+
+  /// No description provided for @tierDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo'**
+  String get tierDemo;
+
+  /// No description provided for @tierVIP.
+  ///
+  /// In en, this message translates to:
+  /// **'VIP'**
+  String get tierVIP;
+
+  /// No description provided for @tierElite.
+  ///
+  /// In en, this message translates to:
+  /// **'Elite'**
+  String get tierElite;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get balance;
+
+  /// No description provided for @signalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal Time'**
+  String get signalTime;
+
+  /// No description provided for @signalQty.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal Qty'**
+  String get signalQty;
+
+  /// No description provided for @analysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis'**
+  String get analysis;
+
+  /// No description provided for @mobileWebApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile & Web App'**
+  String get mobileWebApp;
+
+  /// No description provided for @uploadPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload a screenshot of your Exness account with a new balance.'**
+  String get uploadPrompt;
+
+  /// No description provided for @statusImageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Image selected. Press \'Submit\' to verify.'**
+  String get statusImageSelected;
+
+  /// No description provided for @statusUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading, please wait...'**
+  String get statusUploading;
+
+  /// No description provided for @statusUploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload successful! Please wait a few hours for admin review.'**
+  String get statusUploadSuccess;
+
+  /// No description provided for @statusUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed. Please try again.'**
+  String get statusUploadFailed;
+
+  /// No description provided for @buttonSelectScreenshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Select New Screenshot'**
+  String get buttonSelectScreenshot;
+
+  /// No description provided for @buttonSubmitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit for Review'**
+  String get buttonSubmitReview;
 }
 
 class _AppLocalizationsDelegate

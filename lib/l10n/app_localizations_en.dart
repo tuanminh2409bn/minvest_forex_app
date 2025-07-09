@@ -55,4 +55,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewDetails => 'View Details';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get upgradeAccount => 'Upgrade Account';
+
+  @override
+  String get upgradeAccountSubtitle =>
+      'Submit a new screenshot to upgrade your tier.';
+
+  @override
+  String get upgradeScreenTitle => 'Upgrade Account Tier';
+
+  @override
+  String get compareTiers => 'Compare Tiers';
+
+  @override
+  String get feature => 'Feature';
+
+  @override
+  String get tierDemo => 'Demo';
+
+  @override
+  String get tierVIP => 'VIP';
+
+  @override
+  String get tierElite => 'Elite';
+
+  @override
+  String get balance => 'Balance';
+
+  @override
+  String get signalTime => 'Signal Time';
+
+  @override
+  String get signalQty => 'Signal Qty';
+
+  @override
+  String get analysis => 'Analysis';
+
+  @override
+  String get mobileWebApp => 'Mobile & Web App';
+
+  @override
+  String get uploadPrompt =>
+      'Upload a screenshot of your Exness account with a new balance.';
+
+  @override
+  String get statusImageSelected =>
+      'Image selected. Press \'Submit\' to verify.';
+
+  @override
+  String get statusUploading => 'Uploading, please wait...';
+
+  @override
+  String get statusUploadSuccess =>
+      'Upload successful! Please wait a few hours for admin review.';
+
+  @override
+  String get statusUploadFailed => 'Upload failed. Please try again.';
+
+  @override
+  String get buttonSelectScreenshot => 'Select New Screenshot';
+
+  @override
+  String get buttonSubmitReview => 'Submit for Review';
 }
