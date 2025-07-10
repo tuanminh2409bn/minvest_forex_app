@@ -8,14 +8,16 @@ admin.initializeApp();
 const firestore = admin.firestore();
 const visionClient = new ImageAnnotatorClient();
 
-// Sử dụng cú pháp v2 onObjectFinalized
+// Function này sẽ được kích hoạt mỗi khi có file mới được tải lên Storage
 export const processVerificationImage = onObjectFinalized(
   { region: "asia-southeast1", cpu: 2 },
   async (event) => {
+    // Lấy thông tin file từ event
     const fileBucket = event.data.bucket;
     const filePath = event.data.name;
     const contentType = event.data.contentType;
 
+    // Chỉ xử lý các file ảnh trong thư mục 'verification_images/'
     if (!filePath || !filePath.startsWith("verification_images/")) {
       functions.logger.log(`Bỏ qua file không liên quan: ${filePath}`);
       return null;
@@ -25,10 +27,23 @@ export const processVerificationImage = onObjectFinalized(
       return null;
     }
 
+    // Lấy User ID từ tên file
     const userId = filePath.split("/")[1].split(".")[0];
     functions.logger.log(`Bắt đầu xử lý ảnh cho user: ${userId}`);
 
+    const userRef = firestore.collection("users").doc(userId);
+
     try {
+      // --- CẬP NHẬT QUAN TRỌNG ---
+      // Trước khi xử lý, xóa trạng thái lỗi cũ để chuẩn bị cho lần xác thực mới.
+      // Điều này ngăn việc thông báo lỗi cũ hiển thị lại sau khi đã thành công.
+      await userRef.update({
+        verificationStatus: admin.firestore.FieldValue.delete(),
+        verificationError: admin.firestore.FieldValue.delete(),
+      });
+      // ----------------------------
+
+      // 1. Dùng Vision AI để đọc văn bản từ ảnh
       const [result] = await visionClient.textDetection(
         `gs://${fileBucket}/${filePath}`
       );
@@ -39,8 +54,7 @@ export const processVerificationImage = onObjectFinalized(
       }
       functions.logger.log("Văn bản đọc được:", fullText);
 
-      // =========== CẬP NHẬT REGEX Ở ĐÂY ===========
-      // Quy tắc mới cho phép phần "USD" là tùy chọn (không bắt buộc)
+      // 2. Phân tích văn bản để tìm Số dư và ID
       const balanceRegex = /(\d{1,3}(?:,\d{3})*[.,]\d{2})(?:\s*USD)?/;
       const idRegex = /#\s*(\d{7,})/;
 
@@ -57,6 +71,7 @@ export const processVerificationImage = onObjectFinalized(
 
       functions.logger.log(`Tìm thấy - Số dư: ${balance}, ID Exness: ${exnessId}`);
 
+      // 3. Kiểm tra xem ID Exness này đã được dùng chưa
       const idDoc = await firestore
         .collection("verifiedExnessIds")
         .doc(exnessId).get();
@@ -65,6 +80,7 @@ export const processVerificationImage = onObjectFinalized(
         throw new Error(`ID Exness ${exnessId} đã được sử dụng.`);
       }
 
+      // 4. Gán quyền dựa trên số dư
       let tier = "demo";
       if (balance >= 500) {
         tier = "elite";
@@ -74,20 +90,23 @@ export const processVerificationImage = onObjectFinalized(
 
       functions.logger.log(`Phân quyền cho user ${userId}: ${tier}`);
 
-      const userRef = firestore.collection("users").doc(userId);
+      // 5. Cập nhật quyền cho user và lưu lại ID đã dùng
       const idRef = firestore.collection("verifiedExnessIds").doc(exnessId);
 
       await Promise.all([
-        userRef.set({subscriptionTier: tier}, {merge: true}),
+        userRef.set({subscriptionTier: tier, verificationStatus: 'success'}, {merge: true}),
         idRef.set({userId: userId, processedAt: admin.firestore.FieldValue.serverTimestamp()}),
       ]);
 
       functions.logger.log("Hoàn tất phân quyền thành công!");
       return null;
     } catch (error) {
-      functions.logger.error("Xử lý ảnh thất bại:", error);
-      await firestore.collection("users").doc(userId).set(
-        {verificationStatus: "failed", verificationError: (error as Error).message},
+      const errorMessage = (error as Error).message;
+      functions.logger.error("Xử lý ảnh thất bại:", errorMessage);
+
+      // Cập nhật trạng thái lỗi cho user
+      await userRef.set(
+        {verificationStatus: "failed", verificationError: errorMessage},
         {merge: true}
       );
       return null;

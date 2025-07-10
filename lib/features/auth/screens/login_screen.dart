@@ -1,6 +1,11 @@
+// lib/features/auth/screens/login_screen.dart
+
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:minvest_forex_app/features/auth/screens/signup_screen.dart';
 import 'package:minvest_forex_app/features/auth/services/auth_service.dart';
 import 'package:minvest_forex_app/l10n/app_localizations.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +28,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    // Lấy instance của l10n
+    final l10n = AppLocalizations.of(context);
+
+    // =========== SỬA LỖI Ở ĐÂY ===========
+    // Nếu l10n chưa sẵn sàng (thường trong khung hình đầu tiên),
+    // hiển thị một màn hình chờ thay vì gây lỗi.
+    if (l10n == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    // ======================================
 
     return Scaffold(
       body: Center(
@@ -80,9 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
-                onPressed: () {
-                  _authService.signInWithGoogle();
-                },
+                onPressed: () => _authService.signInWithGoogle(),
                 icon: Image.asset('assets/google_logo.png', height: 24, width: 24),
                 label: Text(l10n.loginWithGoogle),
                 style: ElevatedButton.styleFrom(
@@ -91,6 +103,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                 ),
+              ),
+              if (Platform.isIOS) ...[
+                const SizedBox(height: 16),
+                SignInWithAppleButton(
+                  onPressed: () => _authService.signInWithApple(),
+                  style: SignInWithAppleButtonStyle.black,
+                  borderRadius: BorderRadius.circular(12),
+                  height: 50,
+                ),
+              ],
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(l10n.dontHaveAccount),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                      );
+                    },
+                    child: Text(l10n.signUpButton),
+                  ),
+                ],
               ),
             ],
           ),

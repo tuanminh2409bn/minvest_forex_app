@@ -36,5 +36,7 @@
   "statusUploadSuccess": "Tải lên thành công! Vui lòng chờ quản trị viên xét duyệt trong vài giờ.",
   "statusUploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
   "buttonSelectScreenshot": "Chọn Ảnh Chụp Mới",
-  "buttonSubmitReview": "Gửi Đi Để Xét Duyệt"
+  "buttonSubmitReview": "Gửi Đi Để Xét Duyệt",
+  "dontHaveAccount": "Chưa có tài khoản?",
+  "signUpButton": "Đăng Ký"
 }

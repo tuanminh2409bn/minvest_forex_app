@@ -319,6 +319,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit for Review'**
   String get buttonSubmitReview;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @signUpButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUpButton;
 }
 
 class _AppLocalizationsDelegate

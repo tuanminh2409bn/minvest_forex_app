@@ -120,4 +120,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get buttonSubmitReview => 'Gửi Đi Để Xét Duyệt';
+
+  @override
+  String get dontHaveAccount => 'Chưa có tài khoản?';
+
+  @override
+  String get signUpButton => 'Đăng Ký';
 }

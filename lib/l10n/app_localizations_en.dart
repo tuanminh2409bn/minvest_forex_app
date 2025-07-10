@@ -122,4 +122,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buttonSubmitReview => 'Submit for Review';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get signUpButton => 'Sign Up';
 }

@@ -1,10 +1,11 @@
-// lib/features/verification/screens/verification_screen.dart
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:minvest_forex_app/features/auth/services/auth_service.dart'; // Thêm import
+import 'package:minvest_forex_app/core/providers/user_provider.dart';
+import 'package:minvest_forex_app/features/auth/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -22,11 +23,62 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
+  @override
+  void initState() {
+    super.initState();
+    // Thêm listener ngay khi màn hình được tạo
+    // Dùng addPostFrameCallback để đảm bảo context đã sẵn sàng
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<UserProvider>(context, listen: false).addListener(_handleVerificationResult);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi màn hình bị xóa khỏi cây widget để tránh memory leak
+    Provider.of<UserProvider>(context, listen: false).removeListener(_handleVerificationResult);
+    super.dispose();
+  }
+
+  // Hàm lắng nghe và xử lý kết quả từ UserProvider
+  void _handleVerificationResult() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    if (userProvider.verificationStatus == 'failed') {
+      final errorMessage = userProvider.verificationError ?? 'An unknown error occurred.';
+
+      // Dùng `mounted` để đảm bảo widget còn tồn tại
+      if (mounted) {
+        _showFeedbackSnackbar(errorMessage, isError: true);
+        setState(() {
+          _isLoading = false;
+          _statusMessage = 'Xác thực thất bại. Vui lòng thử lại với ảnh khác.';
+        });
+      }
+      userProvider.clearVerificationStatus();
+    }
+  }
+
+  // Hàm hiển thị SnackBar
+  void _showFeedbackSnackbar(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
+        _statusMessage = 'Đã chọn ảnh. Nhấn "Gửi Đi" để xử lý.';
       });
     }
   }
@@ -36,27 +88,33 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
     setState(() {
       _isLoading = true;
-      _statusMessage = 'Đang tải ảnh lên, vui lòng chờ...';
+      _statusMessage = 'Đang tải và xử lý ảnh...';
     });
 
     try {
       final ref = _storage.ref().child('verification_images/${_currentUser!.uid}.jpg');
       await ref.putFile(_imageFile!);
-
-      setState(() {
-        _statusMessage = 'Tải lên thành công! Vui lòng chờ...';
-        _imageFile = null;
-      });
+      // Khi tải lên thành công, chúng ta chỉ cần chờ listener xử lý kết quả
+      // Không cần thay đổi status message ở đây nữa
 
     } catch (e) {
+      if (!mounted) return;
+      // Nếu có lỗi ngay lúc tải lên (ví dụ: mất mạng)
       setState(() {
-        _statusMessage = 'Tải lên thất bại. Vui lòng thử lại.';
+        _statusMessage = 'Tải ảnh lên thất bại. Vui lòng thử lại.';
       });
+      _showFeedbackSnackbar('Tải ảnh lên thất bại. Vui lòng thử lại.', isError: true);
       print('Lỗi tải ảnh: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      // =========== THÊM KHỐI LỆNH NÀY ===========
+      // Khối finally sẽ LUÔN LUÔN được chạy sau khi try-catch kết thúc
+      // Đảm bảo vòng xoay loading được tắt đi
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      // ===========================================
     }
   }
 
@@ -65,8 +123,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Xác Thực Tài Khoản'),
-        automaticallyImplyLeading: false, // Ẩn nút back
-        // =========== THÊM MỚI Ở ĐÂY ===========
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             onPressed: () => AuthService().signOut(),
@@ -74,7 +131,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
             tooltip: 'Logout',
           ),
         ],
-        // ======================================
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
